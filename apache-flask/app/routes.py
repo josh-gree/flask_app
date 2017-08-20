@@ -1,16 +1,16 @@
 # coding=utf-8
 
+### HELLO
+import flask
 from flask import render_template, flash, redirect, session, url_for, request, g, Markup
 from app import app
 
-import subprocess
+import platform
 
 @app.route('/')
 @app.route('/index')
 def index():
-    python_location = subprocess.check_output(['which','python'])
-    python_version = subprocess.check_output(['python','--version'])
-    return render_template('index.html',python_version=python_version,python_location=python_location)
+    return render_template('index.html',python_version=platform.python_version(),flask_location = flask.__file__)
 
 @app.route('/about')
 def about():

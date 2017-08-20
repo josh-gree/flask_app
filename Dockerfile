@@ -26,25 +26,27 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
     /bin/bash ~/miniconda.sh -b -p /opt/conda && \
     rm ~/miniconda.sh
 
+RUN echo 'export PATH=/opt/conda/bin:$PATH' > ~/.bashrc
+
 RUN /opt/conda/bin/pip install mod_wsgi \
     && /opt/conda/bin/mod_wsgi-express module-config > wsgi.load \
     && mv wsgi.load /etc/apache2/mods-available/ \
     && a2enmod wsgi \
     && service apache2 restart
 
-COPY ./app/requirements.txt /var/www/apache-flask/app/requirements.txt
+COPY ./apache-flask/app/requirements.txt /var/www/apache-flask/app/requirements.txt
 RUN /opt/conda/bin/pip install -r /var/www/apache-flask/app/requirements.txt
 
 # Copy over the apache configuration file and enable the site
-COPY ./apache-flask.conf /etc/apache2/sites-available/apache-flask.conf
+COPY ./apache-flask/apache-flask.conf /etc/apache2/sites-available/apache-flask.conf
 RUN a2ensite apache-flask
 RUN a2enmod headers
 
 # Copy over the wsgi file
-COPY ./apache-flask.wsgi /var/www/apache-flask/apache-flask.wsgi
+COPY ./apache-flask/apache-flask.wsgi /var/www/apache-flask/apache-flask.wsgi
 
-COPY ./run.py /var/www/apache-flask/run.py
-COPY ./app /var/www/apache-flask/app/
+COPY ./apache-flask/run.py /var/www/apache-flask/run.py
+# COPY ./app /var/www/apache-flask/app/
 
 RUN a2dissite 000-default.conf
 RUN a2ensite apache-flask.conf
